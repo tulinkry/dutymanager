@@ -1,0 +1,237 @@
+{block content}
+
+
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="{link Index:default}">Duty Manager</a>
+        </div>
+        <ul class="nav navbar-nav pull-right">
+            <li><a href="{link Sign:logout}">Logout</a></li>
+        </ul>
+    </nav>
+
+
+
+    <div class="panel panel-default overflow-x" n:if="$calendar">
+        <div class="panel-heading">
+            <span class="panel-title">Události z kalendáře: <strong>{$calendar->summary}</strong></span>
+        </div>
+        <div class="panel-body">
+            <p class="well">{$calendar->description}</p>
+            <div class="row">
+              <div class="col-md-6">
+                {control searchForm}
+              </div>
+              <div class="col-md-6">
+                <div class="help">
+                  <p>
+                    Pro správnou funkčnost je nutné systematicky pojmenovávat události v kalendáři podle různých vzorů tak, aby
+                    se v nich dalo nyní vyhledávat.
+                  </p>
+                  <p>
+                    Hledaný výraz může být zadán dvěma způsoby.
+                    <ol>
+                      <li>
+                        <dl>
+                          <dt>Regulární výraz</dt>
+                          <dd>(více informací <a target="_blank" href="http://cs.wikipedia.org/wiki/Regul%C3%A1rn%C3%AD_v%C3%BDraz" title="RegExp">zde</a>)</dd>
+                          <dd>Např. ".*" pro vyhledání všech událostí.</dd>
+                        </dl>
+                      </li>
+                      <li>
+                        <dl>
+                          <dt>Přesný výraz</dt>
+                          <dd>Hledá přesně dané slovo s citlivostí na velká a malá písmenka.</dd>
+                          <dd>Např. "Svačina" pro vyhledání všech událostí jmenujících se Svačina.</dd>
+                        </dl>                    
+                      </li>
+                    </ol>
+                  </p>
+                  <p>
+                    Existují 4 různé druhy oceňování:
+                    <ol>
+                      <li>
+                        <dl>
+                          <dt>Z popisku</dt>
+                          <dd>Ocenění na základě přečtení číselné hodnoty z pole "popis" u události v kalendáři. V tomto případě nemusíte hodinovou taxu vyplňovat.</dd>
+                        </dl>
+                      </li>
+                      <li>
+                        <dl>
+                          <dt>Paušálně</dt>
+                          <dd>Ocenění na základě zadané hodinové taxy a délky události.</dd>
+                        </dl>                    
+                      </li>
+                      <li>
+                        <dl>
+                          <dt>Kombinovaně</dt>
+                          <dd>Využije předchozí dvě možnosti a přitom dává přednost ocenění z popisku.</dd>
+                        </dl>                    
+                      </li>
+                      <li>
+                        <dl>
+                          <dt>Kombinovaně s přičítáním</dt>
+                          <dd>Využije předchozí dvě možnosti a přitom sčítá obě hodnoty.</dd>
+                        </dl>                    
+                      </li>
+                    </ol>
+                  </p>
+                  <p>
+                    Zadáte počátek hledání v kalendáři a konec hledání v kalendáři. Výchozí maska je 'RRRR-MM-DD HH:MM:SS'.
+                  </p>
+                  <p>
+                    Pokud v případě paušálního nebo kombinovaného oceňování chcete, aby z délky události byly odečtené, zákonem dané
+                    povinné, <strong>přestávky</strong> na jídlo po 6 hodinách, zaškrtněte odpovídající tlačítko.
+                  </p>
+                  <p>
+                    V případě, že chcete mít pod kontrolou <strong>týdenní časy a výdělky</strong>, zaškrtněte možnost 'Provést týdenní součty'. Po nalezení událostí, klikem na řádek tabulky se vám zobrazí týdenní součty. Pokud je možnost nezaškrtnutá, tak se vám týdenní součty zobrazují také, ale pro krajní události - první a poslední událost - se nedohledávají všechny události od začátku resp. konce týdne (tj. počty nasčítaných hodin souhlasí přesně s tím, co je vypsáno v tabulce).
+                  </p>
+                  <p>
+                    <strong>Daně</strong> - nově lze pomocí správce směn spočítat přesnou hodnotu vašeho výdělku. Při zaškrtnutí možnosti 'Odečíst daně' se vám zobrazí další pole různých parametrů, ale nemusíte si s tím lámat hlavu, vše je nastaveno podle platné zákonné normy roku 2015.
+                    Nastavte především parametry týkající se vás - studentský status, počet dětí apod.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="row" n:snippet="alerts">
+              <div class="col-lg-12">
+                  <div class="alert alert-info" role="alert" n:foreach="$alerts as $id => $alert">
+                    <a href="{link alert! $id}" title="Nezobrazovat tento!" class="close ajax"><span aria-hidden="true">×</span></a>
+                    {$alert|noescape}
+                  </div>
+               </div>
+            </div>
+        </div>
+        <table class="table table-stripd">
+            <thead>
+            <tr>
+                <th>Název</th>
+                <th>Popis</th>
+                <th>Den</th>
+                <th>Začátek</th>
+                <th>Konec</th>
+                <th>Délka (h)</th>
+                <th>Cena</th>
+                <th>Náhled</th>
+            </tr>
+            </thead>
+            <tbody>
+            {var $week = $events->count ? $events->events[array_keys($events->events)[0]]->m_Start->Week() : null}
+            {var $color = 'active'}
+            {foreach $events->events as $event}
+              {if $week !== $event->m_Start->Week()}
+                {* different week *}
+                  <tr class="success hidden" id="week-summary-{$week}">
+                    <td colspan="5">
+                      Průběžný součet v tomto týdnu
+                      {if !$week_accuracy}
+                        (ve výpisu nemusí být všechny události)
+                      {/if}
+                    </td>
+                    <td>
+                      {$events->weeks[$week]}
+                    </td>
+                    <td>
+                      {if $week_accuracy}
+                        {$events->prices[$week]}
+                      {else}
+                        (nepřesné)
+                      {/if}
+                    </td>
+                    <td></td>
+                  </tr>
+                {var $color = $color === 'active' ? '' : 'active'}
+                {var $week = $event->m_Start->Week()}
+              {/if}
+
+                <tr class="{$color}" data-toggle-week="{$event->m_Start->Week()}">
+                   <td>{$event->m_Summary}</td>
+                   <td>{$event->m_Description}</td>
+                   <td>{$event->m_Start->Weekday()}</td>
+                   <td>
+                      {date('j. m. Y H:i', strtotime($event->m_Start->Render()))}
+                      <sup><span class="badge" title="Číslo týdne v roce">{$event->m_Start->Week()}</span></sup>
+                   </td>
+                   <td>
+                      {date('j. m. Y H:i', strtotime($event->m_End->Render()))}
+                      <sup><span class="badge" title="Číslo týdne v roce">{$event->m_End->Week()}</span></sup>
+                   </td>
+                   <td>{(float)number_format($event->m_Duration, 2)}</td>
+                   <td>{$event->m_Price}</td>
+                   <td>
+                     <a href="{link Event:viewEvent, $calendar->id, $event->m_Id}" title="Detaily">Zobrazit</a>
+                     {*<a href="#"><span class="glyphicon glyphicon-resize-vertical"></span></a>*}
+                   </td>
+                </tr>
+
+                {last}
+                  <tr class="success hidden" id="week-summary-{$week}">
+                    <td colspan="5">
+                      Průběžný součet v tomto týdnu
+                      {if !$week_accuracy}
+                        (ve výpisu nemusí být všechny události)
+                      {/if}
+                    </td>
+                    <td>
+                      {$events->weeks[$week]}
+                    </td>
+                    <td>
+                      {if $week_accuracy}
+                        {$events->prices[$week]}
+                      {else}
+                        (nepřesné)
+                      {/if}
+                    </td>
+                    <td></td>
+                  </tr>
+                {/last}
+            {/foreach}
+            </tbody>
+        </table>
+
+        <div class="panel-footer">
+          <div class="navbar navbar-default">
+            <div class="">
+            <div class="navbar-text pull-left">
+                <span>Počet událostí: <strong><em>{$events->count}</em></strong></span>
+                <span>Celková Cena: <strong><em>{$events->price}</em></strong></span>
+                <span>Efektivní hodinová taxa: <strong><em>{$events->hour_tax|number: 2}/hod</em></strong></span>
+                <span>Celkový čas: <strong><em>{$events->duration|number: 2}h</em></strong></span>
+                {if $events->taxed}
+                  <h4>Daňové výpočty</h4>
+                  <dl>
+                    <dt>Sociální pojištění placené zaměstnavatelem</dt>
+                    <dd>{$events->taxinfo->social_employer}</dd>
+                    <dt>Zdravotní pojištění placené zaměstnavatelem</dt>
+                    <dd>{$events->taxinfo->health_employer}</dd>
+                    <dt>Sociální pojištění placené zaměstnancem</dt>
+                    <dd>{$events->taxinfo->social_employee}</dd>
+                    <dt>Zdravotní pojištění placené zaměstnancem</dt>
+                    <dd>{$events->taxinfo->health_employee}</dd>
+                    <dt>Sleva na dani</dt>
+                    <dd>{$events->taxinfo->sale}</dd>
+                    {if $events->taxinfo->deposit >= 0} 
+                      <dt>Záloha na dani</dt>
+                      <dd>{$events->taxinfo->deposit}</dd>
+                    {else}
+                      <dt>Daňové zvýhodnění</dt>
+                      <dd>{$events->taxinfo->deposit*(-1)}</dd>
+                    {/if}
+                    <dt>Daňový bonus</dt>
+                    <dd>{$events->taxinfo->bonus}</dd>
+                    <dt>Daň (15% ze superhrubé mzdy)</dt>
+                    <dd>{$events->taxinfo->tax}</dd>
+                    <dt>Podíl čisté a hrubé mzdy</dt>
+                    <dd>{$events->taxinfo->coef|number: 2}</dd>
+                  </dl>
+              {/if}
+            </div>
+            <div class="navbar-text pull-right">
+              <a href="{link Calendar:printCalendarEvents, $calendar->id}" target="_blank" class="btn btn-info">Formátovaný tisk</a>
+            </div>
+            </div>
+          </div>
+        </div>
+    </div>
+
+{/block}

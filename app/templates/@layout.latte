@@ -1,0 +1,74 @@
+{**
+ * My Application layout template.
+ *
+ * @param string   $basePath web base path
+ * @param string   $robots   tell robots how to index the content of a page (optional)
+ * @param array    $flashes  flash messages
+ *}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="description" content="Správa událostí v Google kalendáři a jejich vyhledávání." />
+	<meta name="robots" content="{$robots}" n:ifset="$robots">
+  <meta name="author" content="007 (k.tulinger@seznam.cz)" />
+  <meta name="keywords" content="Google, kalendář, směny, ocenění, mzda, plat, vyhledávání, událost, události" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>{block title|striptags}Duty Manager{/block}</title>
+
+  <link rel="stylesheet" media="all" href="{$basePath}/css/screen.css">
+  <link rel="stylesheet" media="all" href="{$basePath}/css/bootstrap.min.css">
+  <link rel="stylesheet" media="all" href="{$basePath}/css/bootstrap-theme.css">
+  <link rel="stylesheet" media="all" href="{$basePath}/css/datetimepicker.css">
+  <link rel="stylesheet" media="all" href="{$basePath}/css/jquery.ui.css">
+  <link rel="stylesheet" media="all" href="{$basePath}/css/switch.css">
+  <link rel="stylesheet" media="print" href="{$basePath}/css/print.css">
+  
+  <link rel="shortcut icon" href="{$basePath}/calendar.png">
+  <style>
+  {block style}
+  {/block}
+  </style>
+	{block head}{/block}
+</head>
+
+<body>
+	<script> document.documentElement.className+=' js' </script>
+
+	<div class="container"> 
+    <div n:foreach="$flashes as $flash" class="flash {$flash->type}">{$flash->message}</div>
+	{include #content}
+
+
+  	{block scripts}
+  	<script src="{$basePath}/js/jquery.js"></script>
+    <script src="{$basePath}/js/jquery.ui.js"></script>
+  	<script src="{$basePath}/js/netteForms.js"></script>
+    <script src="{$basePath}/js/bootstrap.min.js"></script>
+    <script src="{$basePath}/js/moment.js"></script>
+    <script src="{$basePath}/js/datetimepicker.js"></script>
+    <script src="{$basePath}/js/switch.js"></script>
+    <script src="{$basePath}/js/netteAjax.js"></script>
+    <script src="{$basePath}/js/main.js"></script>
+  	{/block}
+    
+    <div class="panel panel-default" id="adds">    
+      <div class="panel-body">
+          <h4>Reklama</h4>
+          <endora></endora>
+      </div>
+    </div>
+    <div class="navbar navbar-default navbar-static-bottom">
+      <div class="navbar-text pull-left">
+        <span>DutyManager</span>
+      </div>
+      <div class="navbar-text pull-right">
+        <span>Designed by 007 & team</span>
+      </div>
+    </div>
+  
+  </div>
+</body>
+</html>

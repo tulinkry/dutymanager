@@ -1,0 +1,70 @@
+
+
+{block style}
+  #adds { display: none; }
+  table { text-align: right; }
+  td { padding-left: 5px;
+       padding-right: 5px; }
+{/block}
+
+
+{block content}
+
+
+
+    <nav class="navbar navbar-default hidden-print" role="navigation">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="{link Index:default}">Duty Manager</a>
+        </div>
+        <ul class="nav navbar-nav pull-right">
+            <li><a href="{link Sign:logout}">Logout</a></li>
+        </ul>
+    </nav>
+
+<div class="panel panel-default"  n:if="$calendar">
+        <div class="panel-body">         
+        <table border="{$mode}">
+            <thead>
+            <tr>
+                <th colspan="8">Vyuctovani pro "{$calendar->summary}" od {date('d. m. Y H:i:s', strtotime($events->start->Render()))} do {date('d. m. Y H:i:s', strtotime($events->end->Render()))}</th>
+            </tr>
+            <tr>
+                <th colspan="8">Události:</th>
+            </tr>
+            </thead>
+            <tbody>
+            {var $i = 1}
+            {foreach $events->events as $event}
+                <tr>
+                   <td>[{$i}]</td>
+                   <td>{$event->m_Summary}</td>
+                   <td>{$event->m_Start->Weekday()}</td>
+                   <td>{date('d. m. Y H:i:s', strtotime($event->m_Start->Render()))}</td>
+                   <td>-</td>
+                   <td>{date('d. m. Y H:i:s', strtotime($event->m_End->Render()))}</td>
+                   <td>{(float)number_format($event->m_Duration, 2)}h =></td>
+                   <td>{$event->m_Price}</td>
+                   {var $i++}
+                </tr>
+            {/foreach}
+            </tbody>
+            <tfoot>
+                <tr>
+                  <td colspan="2">Celkem:</td>
+                  <td colspan="2">avg. time ~ {(float)number_format($events->duration/$events->count, 2)}h</td>
+                  <td colspan="2">price ~ {(float)number_format($events->hour_tax, 2)}/hod</td>
+                  <td>{(float)number_format($events->duration, 2)}h =></td>
+                  <td>{$events->price}</td>
+                </tr>
+            </tfoot>
+        </table>
+        </div>
+        <div class="panel-footer">
+          <div class="navbar navbar-default">
+            <div class="navbar-text pull-right">        
+        <a href="JavaScript:print();" class="hidden-print btn btn-info"><span class="hidden-print">Tisk</span></a> 
+        </div>
+        </div>
+        </div>
+</div>
+{/block}

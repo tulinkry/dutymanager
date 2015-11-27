@@ -1,0 +1,22 @@
+Options -Indexes
+      
+<IfModule mod_rewrite.c>
+
+  #RewriteEngine On
+  
+  # Nette Framework
+  #RewriteCond %{HTTP_HOST} ^(www.)?(.*).([^.]*).([^.]*)$
+  #RewriteCond %{DOCUMENT_ROOT}/domains/%2.%3.%4 !-d
+  #RewriteCond %{DOCUMENT_ROOT}/subdom/%2 !-d
+  #RewriteCond %{REQUEST_URI} ^/wg/
+  #RewriteCond %{REQUEST_FILENAME} !-f
+  #RewriteRule (.*) / [DPI]
+  #RewriteCond %{HTTP_HOST} ^(www.)?([^.]*).([^.]*){2,4}$
+  RewriteCond %{REQUEST_URI} !^/wg/
+  RewriteCond %{REQUEST_URI} !^/publist/
+  RewriteCond %{REQUEST_URI} !^/www/
+  #RewriteCond %{DOCUMENT_ROOT}/www -d
+  RewriteRule (.*) /www/$1 [DPI]
+  # Nette Framework
+
+</IfModule>

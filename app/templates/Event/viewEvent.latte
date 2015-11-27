@@ -1,0 +1,42 @@
+{block content}
+
+
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="{link Index:default}">Duty Manager</a>
+        </div>
+        <ul class="nav navbar-nav pull-right">
+            <li><a href="{link Sign:logout}">Logout</a></li>
+        </ul>
+    </nav>
+
+
+
+
+    <div class="panel panel-default" n:if="$event">
+        <div class="panel-heading">
+            <span class="panel-title">Event</span>
+            <a class="btn pull-right" href="{$referer}">Back</a>
+        </div>
+        <div class="panel-body">
+            {form updateEventForm}
+                <dl class="dl-horizontal">
+                
+                    <dt>{label $form["summary"] /}</dt>
+                        <dd>{input $form["summary"] class => "form-control"}</dd>
+                        
+                    <dt>{label $form["begin"] /}</dt>
+                        <dd>{input $form["begin"] class => "form-control"}</dd>
+                
+                    <dt>{label $form["end"] /}</dt>
+                        <dd>{input $form["end"] class => "form-control"}</dd>
+
+                    <dt>{label $form["description"] /}:</dt>
+                        <dd>{input $form["description"] class => "form-control well"}</dd>
+                <dl>
+                {input $form["update"] class => "btn btn-success"}
+                {input $form["delete"] class => "btn btn-danger"}
+            {/form}
+        </div>
+    </div>
+{/block}
