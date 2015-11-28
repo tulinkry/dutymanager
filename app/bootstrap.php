@@ -33,7 +33,7 @@ $client->setApplicationName("DutyManager");
 $client->setClientId('154411771178-t9f4undfn5i0s1j6iekarmbof01pbp7g.apps.googleusercontent.com');
 $client->setClientSecret('tuPSrR5t7NnJwy7D-yc-Ynv0');
 $client->setScopes('https://www.google.com/calendar/feeds');
-$client->setRedirectUri('http://dutymanager.funsite.cz/check');
+$client->setRedirectUri($container->parameters["redirect_url"]);
 //$client->setRedirectUri('http://localhost/duty/check');
 
 if (isset($_SESSION['access_token']))

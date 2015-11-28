@@ -6,6 +6,7 @@
 #
 common:
 	parameters:
+		redirect_url: "http://localhost/dutymanager/check"
 
 	php:
 		date.timezone: Europe/Prague
@@ -35,5 +36,7 @@ common:
 
 
 production < common:
+	parameters:
+		redirect_url: "http://dutymanager.funsite.cz/check"
 
 development < common:
