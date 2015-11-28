@@ -14,3 +14,22 @@ composer update
 # log and temp must be writable by the web server
 sudo chown -R www-data:www-data {log,temp}
 ```
+
+
+Create local configuration
+```
+cd /var/www/dutymanager/app/config
+nano config.local.neon
+```
+Leave empty
+
+```txt
+parameters:
+
+nette:
+
+services:
+
+factories:
+
+```
