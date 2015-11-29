@@ -156,6 +156,13 @@ class iCalDate {
     $this->_wkst = $ical_weekdays[$weekstart];
   }
 
+  /**
+   * Retuns unix timestamp
+   * @return int
+   */
+  function getTimestamp () {
+    return $this->_epoch;
+  }
 
   /**
   * Set the day of week used for calculation of week starts
@@ -176,8 +183,11 @@ class iCalDate {
   * return which day in week it has
   */
 
-  function Weekday ( $fmt = 0 )
+  function Weekday ( $fmt = 0, $lang = "cz" )
   {
+    if ( ! in_array($lang, [ "cz", "en" ] ) )
+      return "N/A";
+
     $cz_weekdays = array ( 1 => array ( "Pondělí", "Po" ),
                            2 => array ( "Úterý", "Út" ),
                            3 => array ( "Středa", "St" ),
@@ -185,7 +195,19 @@ class iCalDate {
                            5 => array ( "Pátek", "Pá" ),
                            6 => array ( "Sobota", "So" ),
                            0 => array ( "Neděle", "Ne" ) );
-    return $cz_weekdays [ date ( 'w', $this->_epoch ) ] [ $fmt ];
+    $en_weekdays = array ( 1 => array ( "Monday", "Mon", "Mo" ),
+                           2 => array ( "Tuesday", "Tue", "Tu" ),
+                           3 => array ( "Wednesday", "Wen", "We" ),
+                           4 => array ( "Thursday", "Thr", "Th" ),
+                           5 => array ( "Friday", "Fri", "Fri" ),
+                           6 => array ( "Saturday", "Sat", "Sa" ),
+                           0 => array ( "Sunday", "Sun", "Su" ) );
+    $weekdays = array ( "cz" => $cz_weekdays, "en" => $en_weekdays );
+
+    if(! isset($weekdays [ $lang ] [ date ( 'w', $this->_epoch ) ][$fmt] ) )
+      return "N/A";
+
+    return $weekdays [ $lang ] [ date ( 'w', $this->_epoch ) ] [ $fmt ];
   }
 
   function Week ()

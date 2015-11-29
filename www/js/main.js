@@ -34,22 +34,38 @@ $(function() {
 var tooltips = $( "[title]" ).tooltip();
 });
 
-Nette.toggle = function (id, visible) {
-    var el = $('#' + id);
-    if (visible) {
-        el.slideDown();
-    } else {
-        el.slideUp();
-    }
-};
+Nette.toggle = function (id, visible) {};
 
 $(function(){
 	$(".help").toggle("fold",{}, 500);
 	$("input[type=checkbox].switch").bootstrapSwitch({ onSwitchChange: function (a, b) { 
-			$(this).val(!$(this).val());
-			$(this).prop("checked", ! $(this).prop("checked"));
-			$(this).trigger('click');
+			var data = $(this).data("nette-rules");
+			if (data && data[0] && data[0]["toggle"]) {
+				var key = Object.keys (data[0]["toggle"]);
+				if(!key.length)
+					return;
+			    if (b) {
+			        $('#' + key).slideDown();
+			    } else {
+			        $('#' + key).slideUp();
+			    }
+			}
 		} 
+	});
+
+	$("input[type=checkbox].switch").each(function () { 
+		var data = $(this).data("nette-rules");
+		if (data && data[0] && data[0]["toggle"]) {
+			var key = Object.keys (data[0]["toggle"]);
+			if(!key.length)
+				return;
+			
+		    if ($(this).prop("checked")) {
+		        $('#' + key).slideDown();
+		    } else {
+		        $('#' + key).slideUp();
+		    }
+		}
 	});
 
 	$('[data-toggle="popover"]').popover().popover('show')
@@ -66,6 +82,9 @@ $(function(){
 			}
 		}
 	});
+
+
+
 });
 
 
@@ -78,6 +97,30 @@ $(function(){
 
 		e.preventDefault()
 	});
+
+
+
+	$.nette.ext({
+		init: function() {
+			$(".exportForm .index-group").hide();
+			$(".exportForm .draggable").sortable(this.options);
+		},
+		load: function () {
+			$(".exportForm .index-group").hide();
+			$(".exportForm .draggable").sortable(this.options);
+		}
+	}, {
+		options: {
+			start: function (e, ui) {
+				ui.item.startIndex = ui.item.index();
+			},
+			update: function (e, ui) {
+				$(this).find(".index").each(function(i){
+					$(this).val(i + 1)
+				});
+			}
+		}		
+	})
 
 	$.nette.init();
 });

@@ -110,6 +110,7 @@
                 <th>Den</th>
                 <th>Začátek</th>
                 <th>Konec</th>
+                <th>Přestávka</th>
                 <th>Délka (h)</th>
                 <th>Cena</th>
                 <th>Náhled</th>
@@ -122,7 +123,7 @@
               {if $week !== $event->m_Start->Week()}
                 {* different week *}
                   <tr class="success hidden" id="week-summary-{$week}">
-                    <td colspan="5">
+                    <td colspan="6">
                       Průběžný součet v tomto týdnu
                       {if !$week_accuracy}
                         (ve výpisu nemusí být všechny události)
@@ -144,6 +145,8 @@
                 {var $week = $event->m_Start->Week()}
               {/if}
 
+                {var $color = $event->m_Start->Render("j") === date("j") ? 'info' : $color}
+
                 <tr class="{$color}" data-toggle-week="{$event->m_Start->Week()}">
                    <td>{$event->m_Summary}</td>
                    <td>{$event->m_Description}</td>
@@ -156,6 +159,14 @@
                       {date('j. m. Y H:i', strtotime($event->m_End->Render()))}
                       <sup><span class="badge" title="Číslo týdne v roce">{$event->m_End->Week()}</span></sup>
                    </td>
+                   <td>
+                      {if count($event->m_Breaks)}
+                        {foreach $event->m_Breaks as $break}
+                          <span class="break_from">{$break[0]->Render("H:i")}</span> - 
+                          <span class="break_to">{$break[1]->Render("H:i")}</span><br />
+                        {/foreach}
+                      {/if}
+                   </td>
                    <td>{(float)number_format($event->m_Duration, 2)}</td>
                    <td>{$event->m_Price}</td>
                    <td>
@@ -166,7 +177,7 @@
 
                 {last}
                   <tr class="success hidden" id="week-summary-{$week}">
-                    <td colspan="5">
+                    <td colspan="6">
                       Průběžný součet v tomto týdnu
                       {if !$week_accuracy}
                         (ve výpisu nemusí být všechny události)
@@ -227,6 +238,7 @@
               {/if}
             </div>
             <div class="navbar-text pull-right">
+              <a href="{link Export:default}" class="btn btn-info">Export</a>
               <a href="{link Calendar:printCalendarEvents, $calendar->id}" target="_blank" class="btn btn-info">Formátovaný tisk</a>
             </div>
             </div>

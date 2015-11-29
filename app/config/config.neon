@@ -30,10 +30,13 @@ common:
 		authenticator: OAuthAuthenticator
 		routerFactory: RouterFactory
 		router: @routerFactory::createRouter
+		google: Tulinkry\Google\GoogleCalendarService
 
 
 	factories:
 
+	extensions:
+		replicator: Kdyby\Replicator\DI\ReplicatorExtension
 
 production < common:
 	parameters:

@@ -11,6 +11,11 @@ use Nette\Application\UI;
  */
 class IndexPresenter extends BasePresenter
 {
+	/**
+	 * @inject 
+	 * @var Tulinkry\Google\GoogleCalendarService
+	 */
+	public $googleService;
 
 	/**
 	 * Seznam všech uživatelových kalendáøù
@@ -24,7 +29,7 @@ class IndexPresenter extends BasePresenter
 
         global $calendarApi;
 		try {
-	        $this->template->calendars =  $calendarApi->calendarList->listCalendarList();
+	        $this->template->calendars =  $this->googleService->getCalendars();
         } catch ( \Exception $e ) {
             $this -> flashMessage ( "Nepodařilo se kontaktovat Google Kalendář, zkuste to prosím znovu za pár minut." );
         }

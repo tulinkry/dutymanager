@@ -41,5 +41,8 @@ if (isset($_SESSION['access_token']))
 
 set_time_limit( 0 );
 
+function dump ($var) {
+	\Nette\Diagnostics\Debugger::dump($var);
+}
 
 return $container;

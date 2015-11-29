@@ -10,7 +10,8 @@ class Event
 	protected $m_Summary;
 	protected $m_Description;
 	protected $m_Duration;
-
+	protected $m_Breaks = array ();
+	
 	public function __construct ( $start, $end )
 	{
 		if ( gettype($start) != 'object' )
@@ -31,4 +32,12 @@ class Event
     {
         $this->$prop = $val;
     }
+
+	public function addBreak ( $array ) {
+		$this->m_Breaks [] = $array;
+	}
+
+    public function hasBreak () {
+    	return (bool)floor($this->m_Duration / 6);
+    }    
 }

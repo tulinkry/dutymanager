@@ -1,0 +1,4 @@
+{contentType text/csv; charset=utf-8}{if $calendar && $events}{if count($values["fields"])}{foreach $values["fields"] as $key => $name}{$columns[$name->type]}{last}{else},{/last}{/foreach}
+{foreach $events->events as $event}{foreach $values["fields"] as $key => $name}{$handlers[$name["type"]]($event)}{last}{else},{/last}{/foreach}
+{/foreach}{/if}{foreach $values["summary"] as $key => $name}{$summaryColumns[$name->type]}{last}{else},{/last}{/foreach}
+{foreach $values["summary"] as $key => $name}{$summary[$name["type"]]($events)}{last}{else},{/last}{/foreach}{/if}

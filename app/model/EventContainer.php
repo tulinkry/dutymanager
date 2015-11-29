@@ -1,5 +1,8 @@
 <?php
 
+namespace Tulinkry\Google;
+
+use iCalDate;
 
 class EventContainer extends \StdClass {
 
@@ -72,7 +75,67 @@ class EventContainer extends \StdClass {
         return $self;                    
     }
 
-    public function applySort ( $closure ) {
+    public function joinDays ($workmode = true) {
+        $self = $this;
+
+        //print_r ( $this->events );
+        $_events = $self->events;
+        $prev_day = -1;
+        $prev_event = null;
+        foreach ($_events as $key => $event) {
+
+            $duration = $event->m_End->getTimestamp() - $event->m_Start->getTimestamp();
+            if((bool)floor($duration / 6) && $workmode) {
+                // split
+                $num_breaks = floor (($duration / 3600) / 6);
+                for ( $i = 0; $i < $num_breaks; $i ++ ) {
+                    $breakStart = new iCalDate($event->m_Start->getTimestamp() + ($i+1) * ($duration / ($num_breaks+1)) );
+                    $breakEnd = new iCalDate($event->m_Start->getTimestamp() + ($i+1) * ($duration / ($num_breaks+1)) + 30 * 60);
+                    $event->addBreak(array (
+                        $breakStart,
+                        $breakEnd,
+                    ));
+                    // already has been procesed by getEvents ()
+                    // $event->m_Duration = $event->m_Duration - (($breakEnd->getTimestamp() - $breakStart->getTimestamp()) / 3600);
+                }
+            }
+            if($prev_day == $event->m_Start->Render('j')) {
+                // squeeze
+                if ( $prev_event->m_Start->LessThan ($event->m_End) ) {
+                    $breakStart = $prev_event->m_End;
+                    $breakEnd = $event->m_Start;
+                    $prev_event->m_End = $event->m_End;
+                } else {
+                    $breakStart = $event->m_End;
+                    $breakEnd = $prev_event->m_Start;
+                    $event->m_End = $prev_event->m_End;
+                    $prev_event = $event;
+                }
+                $prev_event->m_Duration = ($event->m_Duration + $prev_event->m_Duration); 
+                $prev_event->addBreak(array (
+                    $breakStart,
+                    $breakEnd
+                ));
+                unset ( $_events [ $key ] );
+                //echo "BYLA PAUZA";
+            } else {
+                $prev_event = $event;
+            }
+            $prev_day = $event->m_Start->Render('j');
+        }
+
+        $self->events = $_events;
+        $self->count = count($_events);
+        $this->hour_tax = $this->duration ? round($this->price / $this->duration, 2) : 0;
+        return $this;
+    }
+
+    public function applySort ( $closure = null ) {
+        if(! $closure ) {
+            $closure = function ( $a, $b ) {
+                return (strtotime($a->m_Start->Render()) - strtotime($b->m_Start->Render()));
+            };
+        }
         uasort($this->events, $closure);
         return $this;
     }

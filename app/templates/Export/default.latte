@@ -1,0 +1,86 @@
+{block content}
+
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="{link Index:default}">Duty Manager</a>
+        </div>
+        <ul class="nav navbar-nav pull-right">
+            <li><a href="{link Sign:logout}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="panel panel-default overflow-x" n:if="$calendarId">
+        <div class="panel-heading">
+            <span class="panel-title">Export událostí{*: <strong>{$calendar->summary}</strong>*}</span>
+        </div>
+        <div class="panel-body">
+
+	{snippet exportForm}
+		{form exportForm class => "exportForm"}
+				<ul class="list-group errors" n:if="$form->hasErrors()">
+			        <li n:foreach="$form->errors as $error" class="list-group-item alert alert-danger">{$error}</li>
+				</ul>
+
+
+				<fieldset>
+					<legend>{$form['basic']->currentGroup->getOption('label')}</legend>
+
+					{foreach $form['basic']->controls as $name => $control}
+						{if ! $control->getOption('rendered')}
+							{$form->renderer->renderPair($control)|noescape}
+						{/if}
+					{/foreach}
+
+				</fieldset>
+				<fieldset>
+					<legend>{$form['fields']->currentGroup->getOption('label')}</legend>
+					<div class="draggable">
+						{foreach $form['fields']->containers as $container}
+							<div class="col-md-3 form-group well draggable-group{first 4} clearfix{/first}">
+								{label $container['type'] /}
+								{input $container['type']  class => 'selectpicker form-control value', 'data-live-search' => 'true'}
+								<div class="index-group">
+									{label $container['index'] /}
+									{input $container['index'] class => 'selectpicker form-control index', 'data-live-search' => 'true'}
+								</div>
+								{input $container['remove']}
+							</div>
+						{/foreach}
+					</div>
+					<div class="col-md-12 form-group">
+						{input $form['fields']['add']}
+					</div>
+				</fieldset>
+				<fieldset>
+					<legend>{$form['summary']->currentGroup->getOption('label')}</legend>
+					<div class="draggable">
+						{foreach $form['summary']->containers as $container}
+							<div class="col-md-3 form-group well draggable-group{first 4} clearfix{/first}">
+								{label $container['type'] /}
+								{input $container['type']  class => 'selectpicker form-control value', 'data-live-search' => 'true'}
+								<div class="index-group">
+									{label $container['index'] /}
+									{input $container['index'] class => 'selectpicker form-control index', 'data-live-search' => 'true'}
+								</div>
+								{input $container['remove']}
+							</div>
+						{/foreach}
+					</div>
+					<div class="col-md-12 form-group">
+						{input $form['summary']['add']}
+					</div>
+				</fieldset>
+			<fieldset>
+				{foreach $form->controls as $name => $control}
+					{if ! $control->getOption('rendered')}
+						{label $control /}
+						{input $control}
+					{/if}
+				{/foreach}
+			</fieldset>
+		{/form}
+	{/snippet}
+
+	</div>
+	</div>
+{/block}
