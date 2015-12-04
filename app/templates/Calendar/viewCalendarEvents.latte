@@ -117,7 +117,7 @@
             </thead>
             <tbody>
             {var $week = $events->count ? $events->events[array_keys($events->events)[0]]->m_Start->Week() : null}
-            {var $color = 'active'}
+            {var $formatted_color = 'active'}
             {foreach $events->events as $event}
               {if $week !== $event->m_Start->Week()}
                 {* different week *}
@@ -140,14 +140,14 @@
                     </td>
                     <td></td>
                   </tr>
-                {var $color = $color === 'active' ? '' : 'active'}
+                {var $formatted_color = $formatted_color === 'active' ? '' : 'active'}
                 {var $week = $event->m_Start->Week()}
               {/if}
 
-                {var $color = $event->m_Start->Render("j") === date("j") ? 'info' : $color}
+                {var $color = $event->m_Start->Render("Y-m-j") === date("Y-m-j") ? 'info' : $formatted_color}
 
                 <tr class="{$color}" data-toggle-week="{$event->m_Start->Week()}">
-                   <td>{$event->m_Summary}{$event->m_Start->Render("Y-m-j")} {date("Y-m-j")}</td>
+                   <td>{$event->m_Summary}</td>
                    <td>{$event->m_Description}</td>
                    <td>{$event->m_Start->Weekday()}</td>
                    <td>
