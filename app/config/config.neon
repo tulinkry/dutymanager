@@ -16,8 +16,7 @@ common:
 		application:
 			errorPresenter: Error
 			mapping:
-				#*: Tulinkry\*Module\*Presenter
-				Git: Tulinkry\*Module\*Presenter
+				Git: Tulinkry\GitModule\*Presenter
 
 		database:
 			dsn: 'mysql:host=localhost;dbname=test'

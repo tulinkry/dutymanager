@@ -1,8 +1,7 @@
 <?php
 
 use Nette\Application\Routers\RouteList,
-	Nette\Application\Routers\Route,
-	Nette\Application\Routers\SimpleRouter;
+	Nette\Application\Routers\Route;
 
 
 /**
@@ -26,7 +25,7 @@ class RouterFactory
 		$router[] = new Route ( "event/<calendarId>/<eventId>", "Event:viewEvent" );
 		$router[] = new Route ( "event/new", "Event:addEvent" );
     	$router[] = new Route ( "calendar/<id>/print/<mode=0>", "Calendar:printCalendarEvents" );
-        $router[] = new Route ( "git", "Git:Git:Git:default" );
+        $router[] = new Route ( "git", "Git:Git:default" );
 
 
     	$router[] = new Route('<presenter>/<action>[/<id>]', 'Index:default');
