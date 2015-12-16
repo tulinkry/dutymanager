@@ -256,7 +256,7 @@ class EventContainer extends \StdClass {
         $result = $self->price - $zaloha;
         $result -= $health_employee;
         $result -= $social_employee;
-        $result += $pridavek;
+        //$result += $pridavek;
 
         $coef = $result / $self->price;
 

@@ -16,6 +16,8 @@ class GitPresenter extends \BasePresenter
 	/** @var Tulinkry\Services\ParameterService @inject */
 	public $params;
 
+	/** @var Nette\Caching\IStorage @inject */
+	public $cache;
 
 	public function startup ()
 	{
@@ -42,6 +44,8 @@ class GitPresenter extends \BasePresenter
 		if ($res === TRUE) {
 			$zip->extractSubdirTo(APP_DIR . "/../", self::REPOSITORY . "-" . self::BRANCH_NAME);
 			$zip->close();
+			$this->cache->clean(array(\Nette\Caching\Cache::ALL => true));
+
 			$this->template->status = "saved";
 		} else {
 			throw new \Exception("Cannot extract");
