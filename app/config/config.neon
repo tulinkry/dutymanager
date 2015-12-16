@@ -15,6 +15,9 @@ common:
 	nette:
 		application:
 			errorPresenter: Error
+			mapping:
+				#*: Tulinkry\*Module\*Presenter
+				Git: Tulinkry\*Module\*Presenter
 
 		database:
 			dsn: 'mysql:host=localhost;dbname=test'
@@ -31,6 +34,7 @@ common:
 		routerFactory: RouterFactory
 		router: @routerFactory::createRouter
 		google: Tulinkry\Google\GoogleCalendarService
+		params: Tulinkry\Services\ParameterService
 
 
 	factories:
