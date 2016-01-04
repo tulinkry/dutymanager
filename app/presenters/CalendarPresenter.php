@@ -103,11 +103,15 @@ class CalendarPresenter extends BasePresenter
        $form->addText('from_time', 'Od')
             ->setDefaultValue( $from_time -> Render () )
             ->setAttribute ( "title", "Vyplňte okamžik, od kterého se v kalendáři vyhledává." )
-            ->getControlPrototype()->addClass('form-control');
+            ->getControlPrototype()
+                ->id('frmsearchForm-from_time')
+                ->addClass('form-control');
        $form->addText('to_time', 'Do')
             ->setDefaultValue( $to_time -> Render () )
             ->setAttribute ( "title", "Vyplňte okamžik, do kterého se v kalendáři vyhledává." )
-            ->getControlPrototype()->addClass('form-control');
+            ->getControlPrototype()
+                ->id('frmsearchForm-to_time')
+                ->addClass('form-control');
 
         // select jestli se hledá paušálně
         // nebo pouze z políčka description
