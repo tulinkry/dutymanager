@@ -8,7 +8,7 @@ use Nette\InvalidStateException;
 use Nette\Reflection\ClassType;
 use Tulinkry\Google\EventContainer;
 
-class Exporter extends Object {
+abstract class Exporter extends Object {
 
 	protected $templateName = "";
 	protected $name = "";
@@ -73,10 +73,6 @@ class Exporter extends Object {
             return ($a['index']) - ($b['index']);
         };
 
-        $breakClosure = function ( $e ) {
-            return count($e) >= 2 ? $e[0]->Render("H:i") . " - " . $e[1]->Render("H:i") : "";
-        };
-
         $fields = (array)$template->values->fields;
         uasort($fields, $closure);
         $template->values->fields = $fields;
@@ -97,8 +93,14 @@ class Exporter extends Object {
                 2 => function($event) use ($lang, $fmt) { return $event->m_Start->Weekday($fmt, $lang); },
                 3 => function($event) { return $event->m_Duration; },
                 4 => function($event) { return $event->m_Summary; },
-                5 => function($event) use ($blockFormat) { return $event->m_Start->Render($blockFormat); },
-                6 => function($event) use ($blockFormat) { return $event->m_End->Render($blockFormat); },
+                5 => function($event) use ($blockFormat) { 
+                    if($event->isDummy()) return "";
+                    return $event->m_Start->Render($blockFormat); 
+                },
+                6 => function($event) use ($blockFormat) { 
+                    if($event->isDummy()) return "";
+                    return $event->m_End->Render($blockFormat); 
+                },
                 7 => function($event) { return $event->m_Price; },
                 8 => function($event) { return implode ( ", ", array_map ( function($e) { 
                        return count($e) >= 2 ? $e[0]->Render("H:i") . " - " . $e[1]->Render("H:i") : ""; 
@@ -130,7 +132,6 @@ class Exporter extends Object {
 	}
 
 
-
     /**
      * Gets the value of columns.
      *
@@ -140,7 +141,6 @@ class Exporter extends Object {
     {
         return self::$columns;
     }
-
 
 
     /**

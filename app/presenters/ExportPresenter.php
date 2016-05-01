@@ -204,19 +204,19 @@ class ExportPresenter extends BasePresenter
         $date = clone $events->start;
         $evs = clone $events;
         for ( $i = $events->start->Render("j"); $i < $first->m_Start->Render("j"); $i ++, $date->addDays(1) ) {
-            $events->events [] = new \Event( clone $date, clone $date );
+            $events->events [] = new \Event( clone $date, clone $date, $dummy = true );
         }
         $prev = -1;
         foreach ( $evs->events as $k => $event ) {
             for ( ; $i < $event->m_Start->Render("j"); $i ++, $date->addDays(1) ) {
-                $events->events [] = new \Event( clone $date, clone $date );
+                $events->events [] = new \Event( clone $date, clone $date, $dummy = true );
             }
             $i += $prev == $event->m_Start->Render("j") ? 0 : 1;
             $date->addDays( $prev == $event->m_Start->Render("j") ? 0 : 1 );
             $prev = $event->m_Start->Render("j");
         }
         for ( ; $i <= $events->end->Render("j"); $i ++, $date->addDays(1) ) {
-            $events->events [] = new \Event( clone $date, clone $date );
+            $events->events [] = new \Event( clone $date, clone $date, $dummy = true );
         }
         $events->applySort();
     }
