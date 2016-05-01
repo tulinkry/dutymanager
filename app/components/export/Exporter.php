@@ -20,8 +20,9 @@ class Exporter extends Object {
                 4 => "Název",
                 5 => "Začátek",
                 6 => "Konec",
-                7 => "Cena"
-            );
+                7 => "Cena",
+                8 => "Přestávka",
+    );
 
     protected static $summaryColumns = array(
         1 => "Průměrná délka (h)",
@@ -61,7 +62,7 @@ class Exporter extends Object {
 
 		$options = $this->options;
 		$events = $this->events;
-		$template->setFile(__DIR__ . DIRECTORY_SEPARATOR . $this->templateName );
+        $template->setFile(__DIR__ . DIRECTORY_SEPARATOR . $this->templateName );
 
         $template->listBreaks = false; 
         $template->events = $this->events;
@@ -70,6 +71,10 @@ class Exporter extends Object {
 
         $closure = function ( $a, $b ) {
             return ($a['index']) - ($b['index']);
+        };
+
+        $breakClosure = function ( $e ) {
+            return count($e) >= 2 ? $e[0]->Render("H:i") . " - " . $e[1]->Render("H:i") : "";
         };
 
         $fields = (array)$template->values->fields;
@@ -95,6 +100,10 @@ class Exporter extends Object {
                 5 => function($event) use ($blockFormat) { return $event->m_Start->Render($blockFormat); },
                 6 => function($event) use ($blockFormat) { return $event->m_End->Render($blockFormat); },
                 7 => function($event) { return $event->m_Price; },
+                8 => function($event) { return implode ( ", ", array_map ( function($e) { 
+                       return count($e) >= 2 ? $e[0]->Render("H:i") . " - " . $e[1]->Render("H:i") : ""; 
+                   }, $event -> m_Breaks ) ); 
+                },
             );
 
         $summary = array (
