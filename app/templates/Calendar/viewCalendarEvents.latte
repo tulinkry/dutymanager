@@ -116,13 +116,12 @@
             </tr>
             </thead>
             <tbody>
-            {var $week = $events->count ? $events->events[array_keys($events->events)[0]]->m_Start->Week() : null}
-            {var $last = $events->count ? $events->events[array_keys($events->events)[0]] : null}
+            {var $week = $events->count ? $events->events[array_keys($events->events)[0]]->m_Start->Render('Y-W') : null}
             {var $formatted_color = 'active'}
             {foreach $events->events as $event}
-              {if $week !== $event->m_Start->Week()}
+              {if $week !== $event->m_Start->Render('Y-W')}
                 {* different week *}
-                  <tr class="success hidden" id="week-summary-{$last->m_Start->Render('Y-W')}">
+                  <tr class="success hidden" id="week-summary-{$week}">
                     <td colspan="6">
                       Průběžný součet v tomto týdnu
                       {if !$week_accuracy}
@@ -142,12 +141,12 @@
                     <td></td>
                   </tr>
                 {var $formatted_color = $formatted_color === 'active' ? '' : 'active'}
-                {var $week = $event->m_Start->Week()}
+                {var $week = $event->m_Start->Render('Y-W')}
               {/if}
 
                 {var $color = $event->m_Start->Render("Y-m-j") === date("Y-m-j") ? 'info' : $formatted_color}
 
-                <tr class="{$color}" data-toggle-week="{$event->m_Start->Render('Y-W')}">
+                <tr class="{$color}" data-toggle-week="{$week}">
                    <td>{$event->m_Summary}</td>
                    <td>{$event->m_Description}</td>
                    <td>{$event->m_Start->Weekday()}</td>
@@ -175,10 +174,8 @@
                    </td>
                 </tr>
                 
-                {var $last = $event}
-
                 {last}
-                  <tr class="success hidden" id="week-summary-{$last->m_Start->Render('Y-W')}">
+                  <tr class="success hidden" id="week-summary-{$week}">
                     <td colspan="6">
                       Průběžný součet v tomto týdnu
                       {if !$week_accuracy}
