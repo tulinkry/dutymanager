@@ -35,15 +35,15 @@ class EventContainer extends \StdClass {
             $this->price += $event->m_Price;
             $this->duration += $event->m_Duration;
 
-            if (isset($this->weeks[$event->m_Start->Week()]))
-                $this->weeks[$event->m_Start->Week()] += $event->m_Duration;
+            if (isset($this->weeks[$event->m_Start->Render('Y-W')]))
+                $this->weeks[$event->m_Start->Render('Y-W')] += $event->m_Duration;
             else
-                $this->weeks[$event->m_Start->Week()] = $event->m_Duration;
+                $this->weeks[$event->m_Start->Render('Y-W')] = $event->m_Duration;
 
-            if (isset($this->prices[$event->m_Start->Week()]))
-                $this->prices[$event->m_Start->Week()] += $event->m_Price;
+            if (isset($this->prices[$event->m_Start->Render('Y-W')]))
+                $this->prices[$event->m_Start->Render('Y-W')] += $event->m_Price;
             else
-                $this->prices[$event->m_Start->Week()] = $event->m_Price;
+                $this->prices[$event->m_Start->Render('Y-W')] = $event->m_Price;
         }
         $this->count = count($events);
         $this->hour_tax = $this->duration ? round($this->price / $this->duration, 2) : 0;
