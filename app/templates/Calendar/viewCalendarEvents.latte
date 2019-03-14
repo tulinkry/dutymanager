@@ -121,7 +121,7 @@
             {foreach $events->events as $event}
               {if $week !== $event->m_Start->Week()}
                 {* different week *}
-                  <tr class="success hidden" id="week-summary-{$week}">
+                  <tr class="success hidden" id="week-summary-{$event->m_Start->Render('Y-W')}">
                     <td colspan="6">
                       Průběžný součet v tomto týdnu
                       {if !$week_accuracy}
@@ -146,7 +146,7 @@
 
                 {var $color = $event->m_Start->Render("Y-m-j") === date("Y-m-j") ? 'info' : $formatted_color}
 
-                <tr class="{$color}" data-toggle-week="{$event->m_Start->Week()}">
+                <tr class="{$color}" data-toggle-week="{$event->m_Start->Render('Y-W')}">
                    <td>{$event->m_Summary}</td>
                    <td>{$event->m_Description}</td>
                    <td>{$event->m_Start->Weekday()}</td>
@@ -175,7 +175,7 @@
                 </tr>
 
                 {last}
-                  <tr class="success hidden" id="week-summary-{$week}">
+                  <tr class="success hidden" id="week-summary-{$event->m_Start->Render('Y-W')}">
                     <td colspan="6">
                       Průběžný součet v tomto týdnu
                       {if !$week_accuracy}
