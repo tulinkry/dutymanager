@@ -104,7 +104,7 @@ jobs:
           username:   ${{ secrets.FTP_USER }}
           password:   ${{ secrets.FTP_PASSWORD }}
           protocol:   ftps
-          port:       222
+          port:       21
           server-dir: /public_html/
           exclude: |
             **/.git*
