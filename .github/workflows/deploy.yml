@@ -74,6 +74,10 @@ jobs:
             exit 1
           fi
 
+      # The smoke test just wrote real cache/session files under temp/ and log/ -
+      - name: Reset temp/ and log/ after the smoke test
+        run: find temp log -mindepth 1 ! -name '.gitignore' -delete
+
       # No server env vars on plain FTP hosting - config.local.neon supplies the
       # same env.* parameters config.neon expects instead (see bootstrap.php).
       - name: Write app/config/config.local.neon from secrets
