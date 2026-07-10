@@ -110,6 +110,8 @@ jobs:
             **/.git*
             **/.git*/**
             **/node_modules/**
+            temp/**
+            log/**
             tests/**
             README.md
             CLAUDE.md
