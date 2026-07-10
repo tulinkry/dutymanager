@@ -1,0 +1,118 @@
+name: Deploy to hosting
+
+on:
+  push:
+    branches: [master]
+
+  # Allow manual trigger from the GitHub Actions UI
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: prd
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        with:
+          php-version: '8.4'
+          extensions: curl, mbstring, intl
+          tools: composer:2
+
+      - name: Install dependencies (incl. dev, needed by the test suite)
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Run test suite
+        run: vendor/bin/tester tests/
+
+      - name: Re-install production dependencies (no dev tools shipped to hosting)
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+
+      # Boots the actual production vendor/ (the one about to be shipped) behind PHP's
+      # built-in server and hits it once - this is what actually catches a broken DI
+      # container (a service class not registered in config.neon) or a fatal error in
+      # bootstrap.php. The test suite alone can't: it constructs presenters via `new`,
+      # bypassing the DI container entirely. MOCK_GOOGLE_API=1 means no real Google
+      # secrets are needed for this - it only proves the app boots and answers a request.
+      - name: Smoke test - boot the app and request a page
+        run: |
+          cat > /tmp/router.php <<'PHP'
+          <?php
+          // $_SERVER['DOCUMENT_ROOT'] (set by `php -S ... -t www`), not __DIR__ - this
+          // script's own __DIR__ is wherever it was written to (/tmp), not the docroot.
+          $docroot = $_SERVER['DOCUMENT_ROOT'];
+          $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+          if ($path !== '/' && file_exists($docroot . $path)) {
+              return false;
+          }
+          require $docroot . '/index.php';
+          PHP
+
+          MOCK_GOOGLE_API=1 php -S 127.0.0.1:8080 -t www /tmp/router.php &
+          SERVER_PID=$!
+          trap "kill $SERVER_PID" EXIT
+
+          for i in $(seq 1 20); do
+            # A calendar route, not "/" - it actually constructs CalendarPresenter and
+            # its dependencies (Facades/FormFactories), so a missing DI service
+            # registration fails here even though "/" alone wouldn't touch it.
+            code=$(curl -s -o /tmp/smoke-response.html -w '%{http_code}' http://127.0.0.1:8080/calendar/demo-calendar-1 || true)
+            [ -n "$code" ] && [ "$code" != "000" ] && break
+            sleep 0.5
+          done
+
+          echo "Response code: $code"
+          # PHP's built-in dev server still returns 200 for an uncaught fatal error
+          # unless the script itself set a different status - so the body has to be
+          # checked too, not just the HTTP status code.
+          if [ "$code" -ge 500 ] || grep -qiE 'fatal error|uncaught|tracy-error' /tmp/smoke-response.html; then
+            echo "App failed to boot - response body:"
+            cat /tmp/smoke-response.html
+            exit 1
+          fi
+
+      # Plain FTP hosting has no way to set real server environment variables, so
+      # app/bootstrap.php's getenv(GOOGLE_CLIENT_ID/SECRET/REDIRECT_URI) would read
+      # empty strings there. bootstrap.php already loads app/config/config.local.neon
+      # if present (gitignored, meant for exactly this) - its `parameters:` override
+      # the empty ones addStaticParameters() set from the (absent) env vars. Uses
+      # Nette's own Neon encoder so secrets containing quotes/special characters can't
+      # break the generated file.
+      - name: Write app/config/config.local.neon from secrets
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REDIRECT_URI: ${{ secrets.GOOGLE_REDIRECT_URI }}
+        run: |
+          php -r '
+            require "vendor/autoload.php";
+            $params = ["parameters" => [
+                "googleClientId" => getenv("GOOGLE_CLIENT_ID"),
+                "googleClientSecret" => getenv("GOOGLE_CLIENT_SECRET"),
+                "googleRedirectUri" => getenv("GOOGLE_REDIRECT_URI"),
+            ]];
+            file_put_contents("app/config/config.local.neon", Nette\Neon\Neon::encode($params, true));
+          '
+
+      - name: FTP Deploy
+        uses: SamKirkland/FTP-Deploy-Action@110f9186c050f71550953127052e77650219c287
+        with:
+          server:     ${{ secrets.FTP_SERVER }}
+          username:   ${{ secrets.FTP_USER }}
+          password:   ${{ secrets.FTP_PASSWORD }}
+          protocol:   ftps
+          port:       222
+          server-dir: /public_html/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            tests/**
+            README.md
+            CLAUDE.md
+            Dockerfile
+            docker-compose.yml
+            .dockerignore

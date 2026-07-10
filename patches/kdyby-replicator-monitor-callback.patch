@@ -1,0 +1,67 @@
+--- a/src/Replicator/Container.php
++++ b/src/Replicator/Container.php
+@@ -66,8 +66,16 @@
+ 	 */
+ 	public function __construct(callable $factory, int $createDefault = 0, bool $forceDefault = FALSE)
+ 	{
+-		$this->monitor(Nette\Application\UI\Presenter::class);
+-		$this->monitor(Nette\Forms\Form::class);
++		// Nette\ComponentModel\Component::monitor() used to call the object's own
++		// attached()/detached() methods when the monitored ancestor type appeared;
++		// current Nette only invokes the explicit callback passed here, so the real
++		// reconstruct-rows-from-submitted-data logic must run from the callback itself,
++		// not from the (now dead) attached() override below.
++		$this->monitor(Nette\Application\UI\Presenter::class, function () {
++			$this->loadHttpData();
++			$this->createDefault();
++		});
++		$this->monitor(Nette\Forms\Form::class, function () {});
+ 
+ 		try {
+ 			$this->factoryCallback = Closure::fromCallable($factory);
+@@ -90,25 +98,6 @@
+ 	}
+ 
+ 	/**
+-	 * Magical component factory
+-	 */
+-	protected function attached(Nette\ComponentModel\IComponent $obj): void
+-	{
+-		parent::attached($obj);
+-
+-		if (
+-			!$obj instanceof Nette\Application\UI\Presenter
+-			&&
+-			$this->form instanceof Nette\Application\UI\Form
+-		) {
+-			return;
+-		}
+-
+-		$this->loadHttpData();
+-		$this->createDefault();
+-	}
+-
+-	/**
+ 	 * @return array<Nette\Forms\Container>
+ 	 */
+ 	public function getContainers(bool $recursive = FALSE): array
+@@ -274,8 +263,8 @@
+ 	 */
+ 	public function remove(Nette\ComponentModel\Container $container, bool $cleanUpGroups = FALSE): void
+ 	{
+-		if ($container->parent !== $this) {
+-			throw new Nette\InvalidArgumentException('Given component ' . $container->name . ' is not children of ' . $this->name . '.');
++		if ($container->getParent() !== $this) {
++			throw new Nette\InvalidArgumentException('Given component ' . $container->getName() . ' is not children of ' . $this->getName() . '.');
+ 		}
+ 
+ 		// to check if form was submitted by this one
+@@ -452,7 +441,7 @@
+ 				$_this->onClick[] = function (Nette\Forms\Controls\SubmitButton $button) use ($callback) {
+ 					/** @var self $replicator */
+ 					$replicator = $button->lookup(static::class);
+-					$container = $button->parent;
++					$container = $button->getParent();
+ 					\assert($container instanceof Nette\ComponentModel\Container);
+ 					if (is_callable($callback)) {
+ 						$callback($replicator, $container);

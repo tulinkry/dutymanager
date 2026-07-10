@@ -1,0 +1,4 @@
+.git
+vendor
+temp/cache/*
+log/*.log

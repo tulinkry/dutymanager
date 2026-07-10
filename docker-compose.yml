@@ -1,0 +1,32 @@
+services:
+  app:
+    build:
+      context: .
+      target: runtime
+    ports:
+      - "8080:80"
+    environment:
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-http://localhost:8080/check}
+      # Set to 1 to run against a mocked Google API (deterministic demo calendars/events,
+      # login skipped) instead of a real Google account - see app/bootstrap.php.
+      MOCK_GOOGLE_API: ${MOCK_GOOGLE_API:-}
+      # On by default here since this compose file is for local dev - keeps template
+      # edits picked up live instead of needing a manual cache clear (see bootstrap.php).
+      APP_DEBUG: ${APP_DEBUG:-1}
+    volumes:
+      - ./app:/var/www/html/app
+      - ./www:/var/www/html/www
+      - ./vendor:/var/www/html/vendor
+      - ./log:/var/www/html/log
+      - ./temp/cache:/var/www/html/temp/cache
+      # Not host-bind-mounted: PHP's session handler always creates new session
+      # files at mode 600, and Docker Desktop's bind-mount UID translation makes
+      # those files owned by the host user, not the container's www-data - so
+      # www-data can write a session file and then fail to read it back
+      # ("Failed to read session data"). A named volume stays container-owned.
+      - sessions:/var/www/html/temp/sessions
+
+volumes:
+  sessions:

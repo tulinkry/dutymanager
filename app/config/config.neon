@@ -2,47 +2,44 @@
 # SECURITY WARNING: it is CRITICAL that this file & directory are NOT accessible directly via a web browser!
 #
 # If you don't protect this directory from direct web access, anybody will be able to see your passwords.
-# http://nette.org/security-warning
+# https://doc.nette.org/en/security-warning
 #
-common:
-	parameters:
-		redirect_url: "http://localhost/dutymanager/check"
+php:
+	date.timezone: Europe/Prague
 
-	php:
-		date.timezone: Europe/Prague
-		# zlib.output_compression: yes
+http:
+  forceHttps: true
 
-	nette:
-		application:
-			errorPresenter: Error
-			mapping:
-				Git: Tulinkry\GitModule\*Presenter
+session:
+	autoStart: smart
+	expiration: 30 days
 
-		database:
-			dsn: 'mysql:host=localhost;dbname=test'
-			user:
-			password:
+application:
+	errorPresenter: Error
+	mapping: App\Presentation\*\**Presenter
+	scanComposer: false
 
-		session:
-			autoStart: smart
-			expiration: +30 days
+extensions:
+	replicator: Kdyby\Replicator\DI\ReplicatorExtension
 
+services:
+	# Autowired by type - these have no other services depending on a *specific*
+	# instance, so an explicit factory expression would just be noise. Without an
+	# entry here, the DI container can't autowire them into a presenter constructor
+	# at all (it only searches *registered* services; the test suite never caught
+	# this because it constructs presenters directly with `new`, bypassing the
+	# container entirely).
+	- App\Model\Calendar\CalendarSearchFacade
+	- App\Model\Export\EmptyDayFiller
+	- App\Forms\SearchFormFactory
+	- App\Forms\ExportFormFactory
 
-	services:
-		authenticator: OAuthAuthenticator
-		routerFactory: RouterFactory
-		router: @routerFactory::createRouter
-		google: Tulinkry\Google\GoogleCalendarService
-		params: Tulinkry\Services\ParameterService
+	routerFactory: App\Core\RouterFactory
+	router: @routerFactory::createRouter()
 
+	oauthAuthenticator: App\Model\Google\OAuthAuthenticator(@googleClient)
 
-	factories:
-
-	extensions:
-		replicator: Kdyby\Replicator\DI\ReplicatorExtension
-
-production < common:
-	parameters:
-		redirect_url: "http://dutymanager.funsite.cz/check"
-
-development < common:
+	googleClientFactory: App\Model\Google\ClientFactory(%googleClientId%, %googleClientSecret%, %googleRedirectUri%)
+	googleClient: @googleClientFactory::create()
+	calendarApi: Google\Service\Calendar(@googleClient)
+	google: App\Model\Google\GoogleCalendarService(@calendarApi)

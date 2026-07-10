@@ -1,0 +1,7 @@
+#
+# Loaded only when the MOCK_GOOGLE_API env var is set (see app/bootstrap.php) - swaps
+# the real Google-backed service for one that generates deterministic demo data, so
+# the app runs end-to-end without any Google account or OAuth credentials.
+#
+services:
+	google: App\Model\Google\MockGoogleCalendarService
