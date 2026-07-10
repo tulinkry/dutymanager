@@ -1,3 +1,13 @@
 config.local.neon
 composer.lock
 upload.rb
+
+# Composer/build output - recreated by `composer install` (see .github/workflows/deploy.yml)
+/vendor/
+
+# OS/editor temp files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~

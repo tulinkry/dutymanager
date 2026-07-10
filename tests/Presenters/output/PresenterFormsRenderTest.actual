@@ -1,0 +1,150 @@
+<form action="#" method="post" id="frm-searchForm">
+
+<fieldset>
+<legend>Parametry hledání</legend>
+
+<table>
+<tr>
+	<th><label>Typ porovnávání:</label></th>
+
+	<td><label><input type="radio" name="name_container[match_type]" title="Zvolte typ prohledávání názvů událostí. Prohledává se pomocí shodného řetězce nebo regulárního výrazu." checked value="0">Regulární výraz</label><br><label><input type="radio" name="name_container[match_type]" title="Zvolte typ prohledávání názvů událostí. Prohledává se pomocí shodného řetězce nebo regulárního výrazu." value="1">Přesný výraz</label></td>
+</tr>
+
+<tr>
+	<th><label for="frm-searchForm-name_container-text_match">Hledaný výraz:</label></th>
+
+	<td><input type="text" name="name_container[text_match]" title="Vyplňte hledaný výraz." class="form-control text text" id="frm-searchForm-name_container-text_match"></td>
+</tr>
+
+<tr>
+	<th><label>Typ Ceny:</label></th>
+
+	<td><label><input type="radio" name="value_container[price_type]" title="Zvolte algoritmus výpočtu celkové ceny. Paušálně se vypočítává ze zadané hodinové taxy a délky události. Z popisku
+						se vypočítává, pokud popis události obsahuje číselnou hodnotu. Oba způsoby lze zkombinovat buď s předností ceny v popisku nebo příčítáním ceny v popisku k ceně paušální." value="0">Z popisku</label><br><label><input type="radio" name="value_container[price_type]" title="Zvolte algoritmus výpočtu celkové ceny. Paušálně se vypočítává ze zadané hodinové taxy a délky události. Z popisku
+						se vypočítává, pokud popis události obsahuje číselnou hodnotu. Oba způsoby lze zkombinovat buď s předností ceny v popisku nebo příčítáním ceny v popisku k ceně paušální." value="1">Paušálně</label><br><label><input type="radio" name="value_container[price_type]" title="Zvolte algoritmus výpočtu celkové ceny. Paušálně se vypočítává ze zadané hodinové taxy a délky události. Z popisku
+						se vypočítává, pokud popis události obsahuje číselnou hodnotu. Oba způsoby lze zkombinovat buď s předností ceny v popisku nebo příčítáním ceny v popisku k ceně paušální." checked value="2">Kombinovaně</label><br><label><input type="radio" name="value_container[price_type]" title="Zvolte algoritmus výpočtu celkové ceny. Paušálně se vypočítává ze zadané hodinové taxy a délky události. Z popisku
+						se vypočítává, pokud popis události obsahuje číselnou hodnotu. Oba způsoby lze zkombinovat buď s předností ceny v popisku nebo příčítáním ceny v popisku k ceně paušální." value="3">Kombinovaně s přičítáním</label></td>
+</tr>
+
+<tr>
+	<th><label for="frm-searchForm-value_container-price">Hodinová taxa</label></th>
+
+	<td><input type="text" name="value_container[price]" title="Zadejte hodinovou taxu v případě, že používáte paušální nebo kombinované oceňování." class="form-control text text" id="frm-searchForm-value_container-price" data-nette-rules='[{"op":":equal","rules":[{"op":":filled","msg":"Zadejte cenu"}],"control":"value_container[price_type]","arg":[1,2,3]}]'></td>
+</tr>
+
+<tr>
+	<th><label for="frmsearchForm-from_time">Od</label></th>
+
+	<td><input type="text" name="from_time" title="Vyplňte okamžik, od kterého se v kalendáři vyhledává." id="frmsearchForm-from_time" class="form-control text text" value="2026-07-01 00:00:00"></td>
+</tr>
+
+<tr>
+	<th><label for="frmsearchForm-to_time">Do</label></th>
+
+	<td><input type="text" name="to_time" title="Vyplňte okamžik, do kterého se v kalendáři vyhledává." id="frmsearchForm-to_time" class="form-control text text" value="2026-07-31 23:59:59"></td>
+</tr>
+
+<tr>
+	<th></th>
+
+	<td><label for="frm-searchForm-workmode"><input type="checkbox" name="workmode" class="switch" data-on-text="Ano" data-off-text="Ne" title="Zaškrtněte v případě, že chcete z ceny odečíst povinné pracovní pauzy po 6 hodinách." id="frm-searchForm-workmode">Odečíst pracovní pauzy</label></td>
+</tr>
+
+<tr>
+	<th></th>
+
+	<td><label for="frm-searchForm-week_summary"><input type="checkbox" name="week_summary" class="switch" data-on-text="Ano" data-off-text="Ne" title="Zaškrtněte v případě, že chcete oříznout interval na celé týdny a propočítat tak týdenní částečné součty" id="frm-searchForm-week_summary" checked>Provést týdenní součty</label></td>
+</tr>
+
+<tr>
+	<th></th>
+
+	<td><label for="frm-searchForm-join_days"><input type="checkbox" name="join_days" class="switch" data-on-text="Ano" data-off-text="Ne" title="Zaškrtněte v případě, že chcete více událostí z jednoho dne seskupit do jedné události s výpisem přestávek" id="frm-searchForm-join_days" checked>Seskupit na dny</label></td>
+</tr>
+
+<tr>
+	<th></th>
+
+	<td><label for="frm-searchForm-taxes"><input type="checkbox" name="taxes" class="switch" data-on-text="Ano" data-off-text="Ne" title="Zaškrtněte v případě, že chcete z ceny odečíst daně." id="frm-searchForm-taxes" data-nette-rules='[{"op":":equal","rules":[],"control":"taxes","toggle":{"searchForm-taxes-id":true},"arg":true}]'>Odečíst daně</label></td>
+</tr>
+</table>
+</fieldset>
+
+<div id="searchForm-taxes-id">
+<legend>Daňové parametry</legend>
+
+<table>
+<tr>
+	<th></th>
+
+	<td><label for="frm-searchForm-taxes_container-agreement"><input type="checkbox" name="taxes_container[agreement]" class="switch" data-on-text="Ano" data-off-text="Ne" title="Zaškrtněte v případě, že jste máte podepsané daňové prohlášení" id="frm-searchForm-taxes_container-agreement" checked>Podepsané daňové prohlášení</label></td>
+</tr>
+
+<tr>
+	<th><label for="frm-searchForm-taxes_container-social_employer">Sociální pojištění - zaměstnavatel</label></th>
+
+	<td><input type="text" name="taxes_container[social_employer]" class="form-control text text" id="frm-searchForm-taxes_container-social_employer" data-nette-rules='[{"op":":float","msg":"Pole &#39;Sociální pojištění - zaměstnavatel&#39; musí být číselné."},{"op":":equal","rules":[{"op":":filled","msg":"Pole &#39;Sociální pojištění - zaměstnavatel&#39; musí být vyplněno"}],"control":"taxes","arg":true}]' value="0.25"></td>
+</tr>
+
+<tr>
+	<th><label for="frm-searchForm-taxes_container-health_employer">Zdravotní pojištění - zaměstnavatel</label></th>
+
+	<td><input type="text" name="taxes_container[health_employer]" class="form-control text text" id="frm-searchForm-taxes_container-health_employer" data-nette-rules='[{"op":":float","msg":"Pole &#39;Zdravotní pojištění - zaměstnavatel&#39; musí být číselné."},{"op":":equal","rules":[{"op":":filled","msg":"Pole &#39;Zdravotní pojištění - zaměstnavatel&#39; musí být vyplněno"}],"control":"taxes","arg":true}]' value="0.09"></td>
+</tr>
+
+<tr>
+	<th><label for="frm-searchForm-taxes_container-social_employee">Sociální pojištění - zaměstnanec</label></th>
+
+	<td><input type="text" name="taxes_container[social_employee]" class="form-control text text" id="frm-searchForm-taxes_container-social_employee" data-nette-rules='[{"op":":float","msg":"Pole &#39;Sociální pojištění - zaměstnanec&#39; musí být číselné."},{"op":":equal","rules":[{"op":":filled","msg":"Pole &#39;Sociální pojištění - zaměstnanec&#39; musí být vyplněno"}],"control":"taxes","arg":true}]' value="0.065"></td>
+</tr>
+
+<tr>
+	<th><label for="frm-searchForm-taxes_container-health_employee">Zdravotní pojištění - zaměstnanec</label></th>
+
+	<td><input type="text" name="taxes_container[health_employee]" class="form-control text text" id="frm-searchForm-taxes_container-health_employee" data-nette-rules='[{"op":":float","msg":"Pole Zdravotní pojištění - zaměstnanec&#39; musí být číselné."},{"op":":equal","rules":[{"op":":filled","msg":"Pole &#39;Zdravotní pojištění - zaměstnanec&#39; musí být vyplněno"}],"control":"taxes","arg":true}]' value="0.045"></td>
+</tr>
+
+<tr>
+	<th></th>
+
+	<td><label for="frm-searchForm-taxes_container-student"><input type="checkbox" name="taxes_container[student]" class="switch" data-on-text="Ano" data-off-text="Ne" title="Zaškrtněte v případě, že jste student" id="frm-searchForm-taxes_container-student" checked>Student</label></td>
+</tr>
+
+<tr>
+	<th></th>
+
+	<td><label for="frm-searchForm-taxes_container-ztp"><input type="checkbox" name="taxes_container[ztp]" class="switch" data-on-text="Ano" data-off-text="Ne" title="Zaškrtněte v případě, že jste držitel průkazu ZTP/P" id="frm-searchForm-taxes_container-ztp">Držitel průkazu ZTP/P</label></td>
+</tr>
+
+<tr>
+	<th><label for="frm-searchForm-taxes_container-children">Počet dětí</label></th>
+
+	<td><select name="taxes_container[children]" class="form-control" id="frm-searchForm-taxes_container-children" data-nette-rules='[{"op":":equal","rules":[{"op":":filled","msg":"Počet dětí musí být vyplněn"}],"control":"taxes","arg":true}]'><option value="0" selected>Žádné</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></td>
+</tr>
+
+<tr>
+	<th><label for="frm-searchForm-taxes_container-retirement_lvl">Invalidní důchod</label></th>
+
+	<td><select name="taxes_container[retirement_lvl]" class="form-control" id="frm-searchForm-taxes_container-retirement_lvl" data-nette-rules='[{"op":":equal","rules":[{"op":":filled","msg":"Invalidní důchod musí být vyplněn"}],"control":"taxes","arg":true}]'><option value="0" selected>Žádný</option><option value="1">1. stupně</option><option value="2">2. stupně</option><option value="3">3. stupně</option></select></td>
+</tr>
+
+<tr>
+	<th><label for="frm-searchForm-taxes_container-tax">Daň</label></th>
+
+	<td><input type="text" name="taxes_container[tax]" class="form-control text text" id="frm-searchForm-taxes_container-tax" data-nette-rules='[{"op":":float","msg":"Pole musí být číselné."},{"op":":equal","rules":[{"op":":filled","msg":"Daň musí být vyplněna"}],"control":"taxes","arg":true}]' value="0.15"></td>
+</tr>
+</table>
+</div>
+
+<fieldset>
+<table>
+<tr>
+	<th></th>
+
+	<td><input type="button" name="help" id="help" onclick='$( ".help" ).toggle ( "fold", "{}", 500 );' class="btn btn-secondary button button" value="Help"> <input type="submit" name="send" class="btn btn-primary button button" value="Vyhledat"></td>
+</tr>
+</table>
+</fieldset>
+
+<input type="hidden" name="_do" value="searchForm-submit">
+</form>
