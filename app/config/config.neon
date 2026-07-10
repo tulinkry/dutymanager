@@ -39,7 +39,7 @@ services:
 
 	oauthAuthenticator: App\Model\Google\OAuthAuthenticator(@googleClient)
 
-	googleClientFactory: App\Model\Google\ClientFactory(%googleClientId%, %googleClientSecret%, %googleRedirectUri%)
+	googleClientFactory: App\Model\Google\ClientFactory(%env.GOOGLE_CLIENT_ID%, %env.GOOGLE_CLIENT_SECRET%, %env.GOOGLE_REDIRECT_URI%)
 	googleClient: @googleClientFactory::create()
 	calendarApi: Google\Service\Calendar(@googleClient)
 	google: App\Model\Google\GoogleCalendarService(@calendarApi)
