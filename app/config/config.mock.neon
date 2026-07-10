@@ -3,5 +3,11 @@
 # the real Google-backed service for one that generates deterministic demo data, so
 # the app runs end-to-end without any Google account or OAuth credentials.
 #
+parameters:
+	env:
+		GOOGLE_CLIENT_ID: ''
+		GOOGLE_CLIENT_SECRET: ''
+		GOOGLE_REDIRECT_URI: ''
+
 services:
 	google: App\Model\Google\MockGoogleCalendarService

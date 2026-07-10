@@ -18,12 +18,11 @@ if (filter_var(getenv('APP_DEBUG'), FILTER_VALIDATE_BOOL)) {
 // Specify folder for cache
 $configurator->setTempDirectory(__DIR__ . '/../temp');
 
-// Google OAuth credentials come from the environment (docker-compose.yml), never from source.
-$configurator->addStaticParameters([
-	'googleClientId' => (string) getenv('GOOGLE_CLIENT_ID'),
-	'googleClientSecret' => (string) getenv('GOOGLE_CLIENT_SECRET'),
-	'googleRedirectUri' => (string) getenv('GOOGLE_REDIRECT_URI'),
-]);
+// Whole environment as one parameter (see %env.GOOGLE_CLIENT_ID% etc. in config.neon).
+// getenv() only returns keys that actually exist, so on plain FTP hosting (no real
+// server env vars) this simply omits them - letting config.local.neon's own
+// env.* values merge in untouched instead of being clobbered by an empty string.
+$configurator->addStaticParameters(['env' => getenv()]);
 
 // Create Dependency Injection container from config.neon file
 $configurator->addConfig(__DIR__ . '/config/config.neon');
@@ -33,8 +32,8 @@ if (filter_var(getenv('MOCK_GOOGLE_API'), FILTER_VALIDATE_BOOL)) {
 	// OAuth credentials needed at all.
 	$configurator->addConfig(__DIR__ . '/config/config.mock.neon');
 }
-if (is_file(__DIR__ . '/config/config.local.neon')) {
-	$configurator->addConfig(__DIR__ . '/config/config.local.neon');
+if (is_file($localConfigFile = __DIR__ . '/config/config.local.neon')) {
+	$configurator->addConfig($localConfigFile);
 }
 $container = $configurator->createContainer();
 

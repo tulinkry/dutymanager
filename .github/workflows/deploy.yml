@@ -74,13 +74,8 @@ jobs:
             exit 1
           fi
 
-      # Plain FTP hosting has no way to set real server environment variables, so
-      # app/bootstrap.php's getenv(GOOGLE_CLIENT_ID/SECRET/REDIRECT_URI) would read
-      # empty strings there. bootstrap.php already loads app/config/config.local.neon
-      # if present (gitignored, meant for exactly this) - its `parameters:` override
-      # the empty ones addStaticParameters() set from the (absent) env vars. Uses
-      # Nette's own Neon encoder so secrets containing quotes/special characters can't
-      # break the generated file.
+      # No server env vars on plain FTP hosting - config.local.neon supplies the
+      # same env.* parameters config.neon expects instead (see bootstrap.php).
       - name: Write app/config/config.local.neon from secrets
         env:
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
@@ -89,11 +84,11 @@ jobs:
         run: |
           php -r '
             require "vendor/autoload.php";
-            $params = ["parameters" => [
-                "googleClientId" => getenv("GOOGLE_CLIENT_ID"),
-                "googleClientSecret" => getenv("GOOGLE_CLIENT_SECRET"),
-                "googleRedirectUri" => getenv("GOOGLE_REDIRECT_URI"),
-            ]];
+            $params = ["parameters" => ["env" => [
+                "GOOGLE_CLIENT_ID" => getenv("GOOGLE_CLIENT_ID"),
+                "GOOGLE_CLIENT_SECRET" => getenv("GOOGLE_CLIENT_SECRET"),
+                "GOOGLE_REDIRECT_URI" => getenv("GOOGLE_REDIRECT_URI"),
+            ]]];
             file_put_contents("app/config/config.local.neon", Nette\Neon\Neon::encode($params, true));
           '
 
@@ -106,7 +101,6 @@ jobs:
           protocol:   ftps
           port:       21
           server-dir: /public_html/
-          dangerous-clean-slate: true
           exclude: |
             **/.git*
             **/.git*/**
